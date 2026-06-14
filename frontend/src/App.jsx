@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 
-// 🔥 PROD URL (Render backend)
-const API_URL = "https://file-converter-api.onrender.com";
+// 🔥 ТВОЙ РАБОЧИЙ BACKEND НА RENDER
+const API_URL = "https://file-converter-mvp.onrender.com";
 
 export default function App() {
   const [file, setFile] = useState(null);
@@ -29,7 +29,7 @@ export default function App() {
     multiple: false,
   });
 
-  const convert = () => {
+  const convert = async () => {
     if (!file) {
       alert("Выберите файл");
       return;
@@ -47,6 +47,7 @@ export default function App() {
     xhr.open("POST", `${API_URL}/convert`, true);
     xhr.responseType = "blob";
 
+    // 📊 прогресс загрузки
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
         setProgress(Math.round((e.loaded / e.total) * 100));
@@ -54,18 +55,31 @@ export default function App() {
     };
 
     xhr.onload = () => {
+      setLoading(false);
+      setProgress(0);
+
+      // ❗ если сервер вернул ошибку
       if (xhr.status !== 200) {
-        alert("Ошибка конвертации");
-        setLoading(false);
+        console.error("Server error:", xhr.response);
+        alert("Ошибка конвертации (сервер)");
         return;
       }
 
-      const url = URL.createObjectURL(xhr.response);
+      const blob = xhr.response;
+
+      if (!blob || blob.size === 0) {
+        alert("Пустой ответ от сервера");
+        return;
+      }
+
+      const url = URL.createObjectURL(blob);
 
       const a = document.createElement("a");
       a.href = url;
       a.download = `converted.${format === "jpeg" ? "jpg" : format}`;
+      document.body.appendChild(a);
       a.click();
+      a.remove();
 
       URL.revokeObjectURL(url);
 
@@ -73,14 +87,13 @@ export default function App() {
         { name: file.name, format },
         ...prev,
       ]);
-
-      setLoading(false);
-      setProgress(0);
     };
 
     xhr.onerror = () => {
-      alert("Ошибка сети");
       setLoading(false);
+      setProgress(0);
+      console.error("Network error");
+      alert("Ошибка сети (проверь backend Render)");
     };
 
     xhr.send(fd);

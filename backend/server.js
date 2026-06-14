@@ -7,14 +7,14 @@ const path = require("path");
 
 const app = express();
 
-// 🔥 FIX CORS (важно для Vercel + Render)
+// 🔥 ВАЖНО: CORS ДО ВСЕХ РОУТОВ
 app.use(cors({
   origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
+  allowedHeaders: ["Content-Type"],
 }));
 
-// обязательно для preflight
+// 🔥 ОБЯЗАТЕЛЬНО: обработка preflight
 app.options("*", cors());
 
 const PORT = process.env.PORT || 5000;
@@ -27,7 +27,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const upload = multer({ dest: uploadDir });
 
-// health check
+// healthcheck (очень важно для Render)
 app.get("/", (req, res) => {
   res.send("Image Converter API is running 🚀");
 });
@@ -44,7 +44,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     if (format === "jpg") format = "jpeg";
 
     const allowed = ["png", "jpeg", "webp"];
-
     if (!allowed.includes(format)) {
       return res.status(400).json({ error: "Unsupported format" });
     }
@@ -60,7 +59,6 @@ app.post("/convert", upload.single("file"), async (req, res) => {
     await image.toFile(outputPath);
 
     res.download(outputPath, () => {
-      // cleanup
       fs.unlink(inputFile, () => {});
       fs.unlink(outputPath, () => {});
     });
@@ -70,9 +68,7 @@ app.post("/convert", upload.single("file"), async (req, res) => {
 
     if (inputFile) fs.unlink(inputFile, () => {});
 
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Server error during conversion" });
-    }
+    res.status(500).json({ error: "Server error during conversion" });
   }
 });
 

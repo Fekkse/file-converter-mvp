@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 
+// 🔥 PROD URL (Render backend)
+const API_URL = "https://file-converter-api.onrender.com";
+
 export default function App() {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -11,8 +14,14 @@ export default function App() {
 
   const onDrop = (acceptedFiles) => {
     const f = acceptedFiles[0];
+    if (!f) return;
+
     setFile(f);
-    setPreview(URL.createObjectURL(f));
+
+    if (preview) URL.revokeObjectURL(preview);
+
+    const url = URL.createObjectURL(f);
+    setPreview(url);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -34,7 +43,8 @@ export default function App() {
     fd.append("format", format);
 
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:5001/convert", true);
+
+    xhr.open("POST", `${API_URL}/convert`, true);
     xhr.responseType = "blob";
 
     xhr.upload.onprogress = (e) => {
@@ -44,6 +54,12 @@ export default function App() {
     };
 
     xhr.onload = () => {
+      if (xhr.status !== 200) {
+        alert("Ошибка конвертации");
+        setLoading(false);
+        return;
+      }
+
       const url = URL.createObjectURL(xhr.response);
 
       const a = document.createElement("a");
@@ -54,15 +70,16 @@ export default function App() {
       URL.revokeObjectURL(url);
 
       setHistory((prev) => [
+        { name: file.name, format },
         ...prev,
-        { name: file.name, format }
       ]);
 
       setLoading(false);
+      setProgress(0);
     };
 
     xhr.onerror = () => {
-      alert("Ошибка конвертации");
+      alert("Ошибка сети");
       setLoading(false);
     };
 
@@ -125,10 +142,10 @@ export default function App() {
         </div>
 
         {/* PROGRESS */}
-        {progress > 0 && (
+        {loading && (
           <div className="mt-4 bg-slate-700 rounded">
             <div
-              className="bg-blue-500 h-2 rounded"
+              className="bg-blue-500 h-2 rounded transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>

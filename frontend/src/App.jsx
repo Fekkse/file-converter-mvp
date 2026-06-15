@@ -11,6 +11,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [history, setHistory] = useState([]);
+  const [totalConverted, setTotalConverted] = useState(0);
 
   const onDrop = (acceptedFiles) => {
     const f = acceptedFiles[0];
@@ -28,6 +29,14 @@ export default function App() {
     onDrop,
     multiple: false,
   });
+
+  const clearFile = () => {
+    if (preview) URL.revokeObjectURL(preview);
+
+    setFile(null);
+    setPreview(null);
+    setProgress(0);
+  };
 
   const convert = async () => {
     if (!file) {
@@ -47,7 +56,6 @@ export default function App() {
     xhr.open("POST", `${API_URL}/convert`, true);
     xhr.responseType = "blob";
 
-    // 📊 прогресс загрузки
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) {
         setProgress(Math.round((e.loaded / e.total) * 100));
@@ -58,7 +66,6 @@ export default function App() {
       setLoading(false);
       setProgress(0);
 
-      // ❗ если сервер вернул ошибку
       if (xhr.status !== 200) {
         console.error("Server error:", xhr.response);
         alert("Ошибка конвертации (сервер)");
@@ -87,6 +94,8 @@ export default function App() {
         { name: file.name, format },
         ...prev,
       ]);
+
+      setTotalConverted((prev) => prev + 1);
     };
 
     xhr.onerror = () => {
@@ -104,7 +113,7 @@ export default function App() {
       <div className="w-full max-w-xl bg-slate-800 rounded-2xl shadow-xl p-8">
 
         <h1 className="text-4xl font-bold text-center mb-2">
-          File Converter
+          Convertox
         </h1>
 
         <p className="text-center text-slate-400 mb-8">
@@ -136,8 +145,14 @@ export default function App() {
 
         {/* FILE INFO */}
         {file && (
-          <div className="mt-4 text-green-400">
-            📄 {file.name}
+          <div className="mt-4 bg-slate-700 rounded-lg p-3">
+            <div className="text-green-400">
+              📄 {file.name}
+            </div>
+
+            <div className="text-slate-400 text-sm">
+              Размер: {(file.size / 1024).toFixed(2)} KB
+            </div>
           </div>
         )}
 
@@ -152,6 +167,13 @@ export default function App() {
             <option value="jpeg">JPG</option>
             <option value="webp">WEBP</option>
           </select>
+        </div>
+
+        {/* FORMAT BADGE */}
+        <div className="mt-3 text-center">
+          <span className="bg-blue-600 px-3 py-1 rounded-full text-sm">
+            Конвертация в {format.toUpperCase()}
+          </span>
         </div>
 
         {/* PROGRESS */}
@@ -173,6 +195,25 @@ export default function App() {
           {loading ? "Конвертация..." : "Конвертировать"}
         </button>
 
+        {/* CLEAR */}
+        <button
+          onClick={clearFile}
+          className="w-full mt-3 bg-slate-700 hover:bg-slate-600 transition rounded-lg p-3"
+        >
+          Очистить
+        </button>
+
+        {/* STATS */}
+        <div className="mt-6 text-center">
+          <div className="text-2xl font-bold text-blue-400">
+            {totalConverted}
+          </div>
+
+          <div className="text-slate-400 text-sm">
+            Успешных конвертаций
+          </div>
+        </div>
+
         {/* HISTORY */}
         {history.length > 0 && (
           <div className="mt-6">
@@ -187,6 +228,11 @@ export default function App() {
             ))}
           </div>
         )}
+
+        {/* FOOTER */}
+        <div className="mt-8 text-center text-slate-500 text-xs">
+          Powered by convertox.vercel.app 🚀
+        </div>
 
       </div>
     </div>

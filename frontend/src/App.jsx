@@ -112,13 +112,37 @@ export default function App() {
     <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center p-6">
       <div className="w-full max-w-xl bg-slate-800 rounded-2xl shadow-xl p-8">
 
-        <h1 className="text-4xl font-bold text-center mb-2">
-          Convertox
-        </h1>
+        {/* LOGO */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="flex items-center gap-4">
 
-        <p className="text-center text-slate-400 mb-8">
-          PNG • JPG • WEBP
-        </p>
+            <div className="relative w-14 h-14 flex items-center justify-center">
+              <div className="absolute inset-0 border-4 border-white rounded-full"></div>
+
+              <span className="text-xl font-bold text-white">
+                CX
+              </span>
+
+              <span className="absolute -top-1 -right-1 text-blue-400 text-lg font-bold">
+                ↗
+              </span>
+            </div>
+
+            <div>
+              <h1 className="text-4xl font-bold leading-none">
+                Converto
+                <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+                  X
+                </span>
+              </h1>
+
+              <p className="text-slate-400 text-sm mt-1">
+                Convert. Simple. Fast.
+              </p>
+            </div>
+
+          </div>
+        </div>
 
         {/* DROPZONE */}
         <div
@@ -231,7 +255,7 @@ export default function App() {
 
         {/* FOOTER */}
         <div className="mt-8 text-center text-slate-500 text-xs">
-          Powered by convertox.vercel.app 🚀
+          Powered by ConvertoX 🚀
         </div>
 
       </div>

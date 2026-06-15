@@ -113,36 +113,30 @@ export default function App() {
       <div className="w-full max-w-xl bg-slate-800 rounded-2xl shadow-xl p-8">
 
         {/* LOGO */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center gap-4">
+<div className="flex flex-col items-center mb-8">
+  <div className="flex items-center gap-4">
 
-            <div className="relative w-14 h-14 flex items-center justify-center">
-              <div className="absolute inset-0 border-4 border-white rounded-full"></div>
+    <img
+      src="/favicon.png"
+      alt="ConvertoX Logo"
+      className="w-20 h-20 object-contain drop-shadow-lg"
+    />
 
-              <span className="text-xl font-bold text-white">
-                CX
-              </span>
+    <div>
+      <h1 className="text-4xl font-bold leading-none">
+        Converto
+        <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
+          X
+        </span>
+      </h1>
 
-              <span className="absolute -top-1 -right-1 text-blue-400 text-lg font-bold">
-                ↗
-              </span>
-            </div>
+      <p className="text-slate-400 text-sm mt-1">
+        Convert. Simple. Fast.
+      </p>
+    </div>
 
-            <div>
-              <h1 className="text-4xl font-bold leading-none">
-                Converto
-                <span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-                  X
-                </span>
-              </h1>
-
-              <p className="text-slate-400 text-sm mt-1">
-                Convert. Simple. Fast.
-              </p>
-            </div>
-
-          </div>
-        </div>
+  </div>
+</div>
 
         {/* DROPZONE */}
         <div
